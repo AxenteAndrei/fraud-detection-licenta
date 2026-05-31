@@ -104,6 +104,18 @@ seturi de date dezechilibrate.
 
 ---
 
+## De stiut
+
+- Folderele `data/` si `models/` **nu sunt versionate pe Git** (vezi `.gitignore`).
+  Dupa clonarea repo-ului:
+  1. Adauga manual `data/creditcard.csv` (descarcat de pe
+     [Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)).
+  2. Ruleaza `notebooks/03_models.ipynb` pentru a regenera modelele in `models/`.
+- Fara acesti doi pasi, demo-ul FastAPI nu porneste (ii lipsesc `rf_smote.joblib`
+  si `creditcard.csv`).
+
+---
+
 ## Autor
 
 Axente Andrei-Eugen
