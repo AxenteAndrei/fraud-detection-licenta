@@ -20,7 +20,7 @@ date puternic dezechilibrat.
 │   ├── 02_preprocessing.ipynb    # SMOTE, ADASYN, Random Undersampling
 │   ├── 03_models.ipynb           # RF, XGBoost, LightGBM + evaluare
 │   └── 04_explainability.ipynb   # Interpretabilitate (SHAP, importanta features)
-├── api/                          # Aplicatia demo (Capitolul 7) — FastAPI + SPA
+├── api/                          # Aplicatia (Capitolul 7) — FastAPI + SPA
 │   ├── main.py                   # Montare FastAPI + rute REST
 │   ├── schemas.py                # Modele Pydantic + constante
 │   ├── preprocessor.py           # Scalare Time/Amount, statistici dataset
@@ -61,13 +61,13 @@ jupyter notebook
 Ordinea recomandata:
 `01_eda` → `02_preprocessing` → `03_models` → `04_explainability`
 
-Pasul `03_models` antreneaza si salveaza modelele in `models/` (necesare pentru demo).
+Pasul `03_models` antreneaza si salveaza modelele in `models/` (necesare pentru aplicatie).
 
 ---
 
-## Demo interactiv (FastAPI + SPA)
+## Aplicatia interactiva (FastAPI + SPA)
 
-Aplicatia demo din Capitolul 7: backend REST (FastAPI) + frontend SPA static.
+Aplicatia din Capitolul 7: backend REST (FastAPI) + frontend SPA static.
 Are nevoie de modelul antrenat (`models/rf_smote.joblib`) si de dataset
 (`data/creditcard.csv`) — ! ruleaza mai intai `03_models.ipynb`.
 
@@ -95,7 +95,7 @@ Endpoint-uri principale:
 
 ## Modele antrenate
 
-- Random Forest (SMOTE) — modelul folosit in demo
+- Random Forest (SMOTE) — modelul folosit in aplicatie
 - XGBoost (SMOTE)
 - LightGBM (SMOTE)
 
@@ -111,7 +111,7 @@ seturi de date dezechilibrate.
   1. Adauga manual `data/creditcard.csv` (descarcat de pe
      [Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)).
   2. Ruleaza `notebooks/03_models.ipynb` pentru a regenera modelele in `models/`.
-- Fara acesti doi pasi, demo-ul FastAPI nu porneste (ii lipsesc `rf_smote.joblib`
+- Fara acesti doi pasi, aplicatia FastAPI nu porneste (ii lipsesc `rf_smote.joblib`
   si `creditcard.csv`).
 
 ---
