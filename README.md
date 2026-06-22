@@ -24,9 +24,9 @@ date puternic dezechilibrat.
 │   ├── main.py                   # Montare FastAPI + rute REST
 │   ├── schemas.py                # Modele Pydantic + constante
 │   ├── preprocessor.py           # Scalare Time/Amount, statistici dataset
-│   ├── model.py                  # FraudDetector — predictie, explicabilitate
+│   ├── model.py                  # 3 modele (RF/XGBoost/LightGBM) + SHAP local
 │   ├── generator.py              # Generare tranzactii sintetice per-clasa
-│   └── static/                   # Frontend SPA (index.html, app.js, style.css)
+│   └── static/                   # Frontend SPA (index.html, style.css, config/ui/render/app.js)
 ├── figures/                      # Figuri exportate pentru lucrare (PNG, 300 dpi)
 ├── data/                         # Nu e pe Git — adauga manual creditcard.csv
 └── models/                       # Nu e pe Git — generate de notebooks
@@ -68,12 +68,13 @@ Pasul `03_models` antreneaza si salveaza modelele in `models/` (necesare pentru 
 ## Aplicatia interactiva (FastAPI + SPA)
 
 Aplicatia din Capitolul 7: backend REST (FastAPI) + frontend SPA static.
-Are nevoie de modelul antrenat (`models/rf_smote.joblib`) si de dataset
-(`data/creditcard.csv`) — ! ruleaza mai intai `03_models.ipynb`.
+Ruleaza in paralel cele trei modele antrenate (`models/rf_smote.joblib`,
+`xgb_smote.joblib`, `lgbm_smote.joblib`), cu RandomForest ca model principal,
+si are nevoie de dataset (`data/creditcard.csv`) — ! ruleaza mai intai `03_models.ipynb`.
 
 Instaleaza dependintele:
 ```bash
-pip install fastapi uvicorn
+pip install fastapi uvicorn shap xgboost lightgbm
 ```
 
 Porneste aplicatia din radacina proiectului:
@@ -83,11 +84,12 @@ uvicorn api.main:app --reload
 
 Se deschide la `http://localhost:8000`:
 - `/` — frontend SPA: introdu parametrii tranzactiei sau genereaza automat exemple
-  legitime / frauda, apoi **Verifica tranzactie** pentru predictie + top 5 features.
+  legitime / frauda, apoi **Verifica tranzactie**. Rezultatul arata cele 3 modele in
+  paralel, contributiile SHAP locale si un prag de decizie reglabil.
 - `/docs` — Swagger UI cu endpoint-urile REST.
 
 Endpoint-uri principale:
-- `POST /predict` — predictie pentru o tranzactie (eticheta, probabilitate, top 5 features, mesaj).
+- `POST /predict` — predictie (eticheta, probabilitate, cele 3 modele, contributii SHAP locale, mesaj).
 - `GET /generate/{class_type}` — genereaza o tranzactie sintetica (`legitimate` / `fraud`).
 - `GET /health` — status model.
 
@@ -95,9 +97,9 @@ Endpoint-uri principale:
 
 ## Modele antrenate
 
-- Random Forest (SMOTE) — modelul folosit in aplicatie
-- XGBoost (SMOTE)
-- LightGBM (SMOTE)
+- Random Forest (SMOTE) — model principal (predictie + SHAP local)
+- XGBoost (SMOTE) — rulat in paralel pentru comparatie
+- LightGBM (SMOTE) — rulat in paralel pentru comparatie
 
 Metrica principala: **AUC-PR** (aria sub curba Precision-Recall) — relevanta pe
 seturi de date dezechilibrate.
@@ -111,8 +113,8 @@ seturi de date dezechilibrate.
   1. Adauga manual `data/creditcard.csv` (descarcat de pe
      [Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)).
   2. Ruleaza `notebooks/03_models.ipynb` pentru a regenera modelele in `models/`.
-- Fara acesti doi pasi, aplicatia FastAPI nu porneste (ii lipsesc `rf_smote.joblib`
-  si `creditcard.csv`).
+- Fara acesti doi pasi, aplicatia FastAPI nu porneste (ii lipsesc modelele din
+  `models/` si `creditcard.csv`).
 
 ---
 
