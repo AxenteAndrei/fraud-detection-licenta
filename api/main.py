@@ -41,7 +41,7 @@ STATIC_DIR  = Path(__file__).resolve().parent / "static"
 app = FastAPI(
     title="API Detectie Frauda",
     version="1.0",
-    description="Backend RandomForest + SMOTE pentru demo-ul din Cap. 7.",
+    description="Backend RandomForest + SMOTE pentru detectia fraudelor in tranzactii cu card de credit.",
 )
 
 # componente populate la startup
