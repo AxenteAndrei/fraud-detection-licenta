@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
 # Pydantic models + constante partajate.
-# Pastrate intr-un modul separat ca sa fie importabile fara a trage si dependintele
-# de joblib / numpy din model.py si preprocessor.py.
 
 from pydantic import BaseModel, ConfigDict, create_model
 
-# ordinea EXACTA in care modelul rf_smote astepta features la antrenare
+# ordinea EXACTA in care modelele asteapta features la antrenare
 FEATURE_NAMES = ["Time"] + [f"V{i}" for i in range(1, 29)] + ["Amount"]
 
-# top 5 dupa importanta RF (Capitolul 6 — rf_smote)
 TOP_FEATURES = ["V14", "V10", "V12", "V17", "V16"]
-
-# metrica raportata in /health si in footer-ul UI
 AUC_PR = 0.8842
+DEFAULT_THRESHOLD = 0.5
 
-
-# ------------------------------------------------------------------ input request
 # 30 de campuri float cu default 0.0, construite dinamic
 TransactionInput = create_model(
     "TransactionInput",
@@ -23,19 +17,26 @@ TransactionInput = create_model(
 )
 
 
-# ------------------------------------------------------------------ output models
-class FeatureContribution(BaseModel):
+class ModelScore(BaseModel):
+    name: str
+    probability: float
+
+
+class ShapContribution(BaseModel):
+    # shap are SEMN: pozitiv impinge spre FRAUDA, negativ spre LEGITIMA
     feature: str
     value: float
-    importance: float
-    contribution: float
+    shap: float
 
 
 class PredictResponse(BaseModel):
-    label: str                                  # "FRAUDA" | "LEGITIMA"
-    probability: float                          # P(frauda) in [0, 1]
-    top5_features: list[FeatureContribution]
+    label: str
+    probability: float                          # P(frauda) — modelul principal RF
+    threshold: float
     message: str
+    models: list[ModelScore]
+    shap_base: float
+    shap: list[ShapContribution]
 
 
 class HealthResponse(BaseModel):

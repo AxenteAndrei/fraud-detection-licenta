@@ -14,9 +14,8 @@
 <header>
   <div>
     <h1>Detectie Frauda Financiara</h1>
-    <div class="sub">Model: RandomForest + SMOTE &nbsp;&middot;&nbsp; AUC-PR = 0.8842</div>
+    <div class="sub">Modele comparate: RandomForest &middot; XGBoost &middot; LightGBM &nbsp;&middot;&nbsp; principal: RF (AUC-PR 0.8842)</div>
   </div>
-  <div class="health"><span id="hdot" class="dot"></span><span id="htext">verificare...</span></div>
 </header>
 
 <div class="app">
@@ -42,11 +41,13 @@
 
     <div class="grp-toggle" id="t-rest1" data-target="rest1">
       <span class="chev"></span> Alte componente PCA (V1 &ndash; V14)
+      <span class="info-icon" data-tip="Componente PCA anonimizate, fara semnificatie cu nume real (datele au fost transformate pentru confidentialitate). Valoarea 0 = tipic; cu cat se departeaza de 0 (in plus sau minus), cu atat tranzactia e mai neobisnuita pe acea dimensiune.">?</span>
     </div>
     <div class="grp-body" id="grp-rest1"></div>
 
     <div class="grp-toggle" id="t-rest2" data-target="rest2">
       <span class="chev"></span> Alte componente PCA (V15 &ndash; V28)
+      <span class="info-icon" data-tip="Componente PCA anonimizate, fara semnificatie cu nume real (datele au fost transformate pentru confidentialitate). Valoarea 0 = tipic; cu cat se departeaza de 0 (in plus sau minus), cu atat tranzactia e mai neobisnuita pe acea dimensiune.">?</span>
     </div>
     <div class="grp-body" id="grp-rest2"></div>
   </aside>
@@ -56,7 +57,19 @@
 
     <div class="card">
       <h2>Rezultat</h2>
-      <div id="result"><p class="empty">Apasa <b>Verifica tranzactie</b> pentru a vedea predictia modelului.</p></div>
+      <div id="result-empty"><p class="empty">Apasa <b>Verifica tranzactie</b> pentru a vedea predictia modelului.</p></div>
+      <div id="result" hidden>
+        <div id="badge-wrap"></div>
+        <div id="prob-wrap"></div>
+        <div class="thr-control">
+          <div class="thr-head"><span>Prag de decizie</span><span id="thr-val" class="thr-num">0.50</span></div>
+          <input type="range" id="thr-slider" min="0" max="1" step="0.01" value="0.5">
+          <p class="thr-hint">Muta pragul pentru a vedea compromisul: un prag mai mic prinde mai multe fraude (recall &uarr;) dar da mai multe alarme false (precision &darr;).</p>
+        </div>
+        <div id="models-wrap"></div>
+        <div id="msg-wrap"></div>
+        <div id="shap-wrap"></div>
+      </div>
     </div>
 
     <div class="card">
@@ -75,11 +88,14 @@
   </main>
 </div>
 
-<footer>Model: RandomForest + SMOTE &nbsp;&middot;&nbsp; Dataset: CreditCard Fraud ULB &nbsp;&middot;&nbsp; Lucrare de licenta &mdash; ULBS, Informatica</footer>
+<footer>Modele: RandomForest / XGBoost / LightGBM (SMOTE) &nbsp;&middot;&nbsp; Dataset: CreditCard Fraud ULB &nbsp;&middot;&nbsp; Lucrare de licenta &mdash; ULBS, Informatica</footer>
 
 <!-- tooltip global, rendered la <body> ca sa NU fie clipped de overflow-ul sidebar-ului -->
 <div id="tip" hidden></div>
 
+<script src="/static/config.js" defer></script>
+<script src="/static/ui.js" defer></script>
+<script src="/static/render.js" defer></script>
 <script src="/static/app.js" defer></script>
 </body>
 </html>

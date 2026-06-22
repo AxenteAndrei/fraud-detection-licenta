@@ -24,6 +24,7 @@ from .model import FraudDetector
 from .preprocessor import Preprocessor
 from .schemas import (
     AUC_PR,
+    DEFAULT_THRESHOLD,
     FEATURE_NAMES,
     HealthResponse,
     PredictResponse,
@@ -32,7 +33,9 @@ from .schemas import (
 
 # ----------------------------------------------------------------- cai resurse
 ROOT = Path(__file__).resolve().parent.parent
-MODEL_PATH  = ROOT / "models" / "rf_smote.joblib"
+RF_PATH     = ROOT / "models" / "rf_smote.joblib"
+XGB_PATH    = ROOT / "models" / "xgb_smote.joblib"
+LGBM_PATH   = ROOT / "models" / "lgbm_smote.joblib"
 DATA_PATH   = ROOT / "data" / "creditcard.csv"
 STATS_CACHE = ROOT / "data" / "demo_stats.joblib"
 STATIC_DIR  = Path(__file__).resolve().parent / "static"
@@ -53,11 +56,11 @@ tx_generator: TransactionGenerator | None = None
 @app.on_event("startup")
 def load_resources():
     global detector, preprocessor, tx_generator
-    detector = FraudDetector(MODEL_PATH)
+    detector = FraudDetector(RF_PATH, XGB_PATH, LGBM_PATH)
     stats = Preprocessor.load_stats(STATS_CACHE, DATA_PATH)
     preprocessor = Preprocessor(stats)
     tx_generator = TransactionGenerator(stats)
-    print(f"[startup] Model + statistici incarcate. Features: {len(FEATURE_NAMES)}")
+    print(f"[startup] 3 modele + SHAP + statistici incarcate. Features: {len(FEATURE_NAMES)}")
 
 
 # ================================================================ endpoints
@@ -76,15 +79,20 @@ def predict(tx: TransactionInput):
     x_scaled = np.array([scaled[name] for name in FEATURE_NAMES], dtype=float)
 
     proba = detector.predict_proba(x_scaled)
-    este_frauda = detector.is_fraud(proba)
-    top5 = detector.top_contributions(x_scaled, raw, FEATURE_NAMES, k=5)
-    top_names = ", ".join(t.feature for t in top5[:3])
+    este_frauda = detector.is_fraud(proba, DEFAULT_THRESHOLD)
+
+    models = detector.model_scores(x_scaled)
+    shap_base, shap_contribs = detector.shap_contributions(x_scaled, raw, FEATURE_NAMES, k=8)
+    top_names = ", ".join(c.feature for c in shap_contribs[:3])
 
     return PredictResponse(
         label="FRAUDA" if este_frauda else "LEGITIMA",
         probability=round(proba, 4),
-        top5_features=top5,
-        message=FraudDetector.compose_message(este_frauda, top_names),
+        threshold=DEFAULT_THRESHOLD,
+        message=FraudDetector.compose_message(este_frauda, top_names, DEFAULT_THRESHOLD),
+        models=models,
+        shap_base=shap_base,
+        shap=shap_contribs,
     )
 
 

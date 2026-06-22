@@ -309,3 +309,111 @@ footer{
   border-top:1px solid var(--border);
   background:var(--bg-side);
 }
+
+/* =================================================== buton loading */
+.btn.loading, .btn-primary:disabled{ opacity:.65; cursor:progress; }
+
+/* =================================================== banda normalitate (V-uri) */
+.norm{ display:flex; align-items:center; gap:8px; margin-top:7px; }
+.norm-track{
+  position:relative; flex:1; height:6px; border-radius:4px;
+  background:linear-gradient(90deg,#dc2626 0%,#eab308 25%,#16a34a 50%,#eab308 75%,#dc2626 100%);
+}
+.norm-marker{
+  position:absolute; top:50%; left:50%; width:11px; height:11px; border-radius:50%;
+  background:#fff; border:2px solid var(--bg-side);
+  transform:translate(-50%,-50%);
+  box-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+.norm-tag{ font-size:.68rem; font-weight:600; min-width:92px; text-align:right; }
+.norm-tag.n0{ color:#22c55e; }
+.norm-tag.n1{ color:#eab308; }
+.norm-tag.n2{ color:#f59e0b; }
+.norm-tag.n3{ color:#ef4444; }
+
+/* =================================================== bara probabilitate */
+#prob-wrap{ margin:18px 0 4px; }
+.prob-head{ display:flex; justify-content:space-between; font-size:.8rem; color:var(--muted); font-weight:500; margin-bottom:7px; }
+.prob-pct{ color:#fff; font-weight:700; font-variant-numeric:tabular-nums; }
+.prob-bar{
+  position:relative; height:16px; border-radius:8px;
+  background:var(--panel-2); overflow:visible;
+  border:1px solid var(--border-soft);
+}
+.prob-fill{ height:100%; width:0; border-radius:7px; transition:width .4s cubic-bezier(.2,.7,.3,1); }
+.prob-fill.fraud{ background:linear-gradient(90deg,#ef4444,#dc2626); }
+.prob-fill.legit{ background:linear-gradient(90deg,#22c55e,#16a34a); }
+.prob-thr{
+  position:absolute; top:-3px; bottom:-3px; width:2px;
+  background:#e5e7eb; transform:translateX(-1px);
+}
+.prob-thr::before{
+  content:""; position:absolute; top:-4px; left:-3px;
+  border-left:4px solid transparent; border-right:4px solid transparent;
+  border-top:5px solid #e5e7eb;
+}
+.prob-foot{ position:relative; height:16px; margin-top:4px; font-size:.68rem; color:var(--muted-2); }
+.prob-foot > span:first-child{ position:absolute; left:0; }
+.prob-foot > span:last-child{ position:absolute; right:0; }
+.prob-thr-lab{ position:absolute; transform:translateX(-50%); color:var(--muted); font-weight:600; white-space:nowrap; }
+
+
+/* =================================================== prag de decizie */
+.thr-control{
+  background:var(--panel-2); border:1px solid var(--border-soft);
+  border-radius:10px; padding:14px 16px; margin:8px 0 4px;
+}
+.thr-head{
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.85rem; font-weight:600; color:var(--text);
+}
+.thr-num{
+  font-variant-numeric:tabular-nums; color:#fff;
+  background:var(--line-2); border:1px solid var(--line);
+  padding:2px 11px; border-radius:12px;
+}
+.thr-control input[type=range]{ margin-top:11px; }
+.thr-hint{ color:var(--muted); font-size:.74rem; margin:9px 0 0; line-height:1.45; }
+
+/* =================================================== comparatie modele */
+.models{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+@media (max-width:560px){ .models{ grid-template-columns:1fr; } }
+.model-card{
+  border:1px solid var(--border); border-radius:10px;
+  padding:14px 12px; text-align:center; background:var(--panel-2);
+  transition:background .2s, border-color .2s;
+}
+.model-card.fraud{ border-color:rgba(239,68,68,.5); background:var(--red-soft); }
+.model-card.legit{ border-color:rgba(34,197,94,.4); background:var(--green-soft); }
+.m-name{ font-size:.8rem; font-weight:600; color:var(--text); }
+.m-star{ color:#fbbf24; margin-left:3px; }
+.m-prob{ font-size:1.5rem; font-weight:700; margin:6px 0; font-variant-numeric:tabular-nums; color:#fff; }
+.m-pill{ display:inline-block; padding:3px 11px; border-radius:12px; font-size:.68rem; font-weight:700; letter-spacing:.04em; }
+.m-pill.fraud{ background:rgba(239,68,68,.2); color:#fca5a5; }
+.m-pill.legit{ background:rgba(34,197,94,.18); color:#86efac; }
+
+/* =================================================== plot SHAP local */
+.sub-note{ font-weight:500; color:var(--muted); font-size:.8rem; }
+.sh-legend{ display:flex; justify-content:space-between; font-size:.72rem; font-weight:600; margin:2px 2px 9px; }
+.sh-legend .legit{ color:#86efac; }
+.sh-legend .fraud{ color:#fca5a5; }
+.shap{ display:flex; flex-direction:column; gap:7px; }
+.sh-row{ display:flex; align-items:center; gap:10px; }
+.sh-feat{
+  width:96px; flex-shrink:0; font-size:.8rem; font-weight:700; color:var(--text);
+  display:flex; flex-direction:column; line-height:1.2;
+}
+.sh-feat .sh-val{ font-weight:400; font-size:.68rem; color:var(--muted); }
+.sh-track{
+  position:relative; flex:1; height:18px;
+  background:var(--panel-2); border-radius:5px;
+  border:1px solid var(--border-soft); overflow:hidden;
+}
+.sh-axis{ position:absolute; left:50%; top:0; bottom:0; width:1px; background:var(--line); z-index:1; }
+.sh-bar{ position:absolute; top:2px; bottom:2px; border-radius:3px; }
+.sh-bar.pos{ background:linear-gradient(90deg,#dc2626,#ef4444); }
+.sh-bar.neg{ background:linear-gradient(90deg,#16a34a,#22c55e); }
+.sh-num{ width:58px; flex-shrink:0; text-align:right; font-size:.78rem; font-weight:600; font-variant-numeric:tabular-nums; }
+.sh-num.pos{ color:#fca5a5; }
+.sh-num.neg{ color:#86efac; }
+.sh-hint{ color:var(--muted); font-size:.74rem; margin:10px 0 0; line-height:1.5; }
