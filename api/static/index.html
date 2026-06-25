@@ -13,7 +13,7 @@
 
 <header>
   <div>
-    <h1>Detectie Frauda Financiara</h1>
+    <h1>Detecția fraudelor în tranzacții financiare folosind inteligența artificială</h1>
     <div class="sub">Modele comparate: RandomForest &middot; XGBoost &middot; LightGBM &nbsp;&middot;&nbsp; principal: RF (AUC-PR 0.8842)</div>
   </div>
 </header>
@@ -28,6 +28,25 @@
     <div class="gen-row">
       <button class="btn btn-green" id="btn-gen-legit" type="button">Genereaza LEGITIMA</button>
       <button class="btn btn-red" id="btn-gen-fraud" type="button">Genereaza FRAUDA</button>
+    </div>
+
+    <div class="sample-box">
+      <div class="sample-lab">Exemplu real din dataset
+        <span class="info-icon" data-tip="Tranzactii reale din SETUL DE TEST (held-out, 20% din dataset) — modelul nu le-a vazut la antrenare. Eticheta reala (frauda/legitim) e ascunsa pana dupa verificare, ca sa poti evalua obiectiv predictia. Valorile complete sunt trimise la model, nu cele afisate de slidere (limitate la [-5, 5]).">?</span>
+        <span class="sample-tag">set de test</span>
+      </div>
+      <p class="sample-hint">Tranzactii reale pe care modelul nu le-a vazut la antrenare.</p>
+
+      <div class="dd" id="sample-dd">
+        <button type="button" class="dd-trigger" id="dd-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dd-trigger-text" id="dd-trigger-text">Alege o tranzactie reala</span>
+          <span class="dd-caret"></span>
+        </button>
+        <div class="dd-panel" id="dd-panel" hidden>
+          <input type="text" class="dd-search" id="dd-search" placeholder="Filtreaza dupa # sau suma..." autocomplete="off">
+          <div class="dd-list" id="dd-list" role="listbox"></div>
+        </div>
+      </div>
     </div>
 
     <button class="btn btn-primary" id="btn-verify" type="button">Verifica tranzactie</button>
@@ -61,12 +80,8 @@
       <div id="result" hidden>
         <div id="badge-wrap"></div>
         <div id="prob-wrap"></div>
-        <div class="thr-control">
-          <div class="thr-head"><span>Prag de decizie</span><span id="thr-val" class="thr-num">0.50</span></div>
-          <input type="range" id="thr-slider" min="0" max="1" step="0.01" value="0.5">
-          <p class="thr-hint">Muta pragul pentru a vedea compromisul: un prag mai mic prinde mai multe fraude (recall &uarr;) dar da mai multe alarme false (precision &darr;).</p>
-        </div>
         <div id="models-wrap"></div>
+        <div id="truth-wrap"></div>
         <div id="msg-wrap"></div>
         <div id="shap-wrap"></div>
       </div>
@@ -88,7 +103,7 @@
   </main>
 </div>
 
-<footer>Modele: RandomForest / XGBoost / LightGBM (SMOTE) &nbsp;&middot;&nbsp; Dataset: CreditCard Fraud ULB &nbsp;&middot;&nbsp; Lucrare de licenta &mdash; ULBS, Informatica</footer>
+<footer>Dataset: CreditCard Fraud ULB &nbsp;&middot;&nbsp; Lucrare de licenta &mdash; Axente Andrei-Eugen &nbsp;&middot;&nbsp; ULBS &mdash; Stiinte, Informatica</footer>
 
 <!-- tooltip global, rendered la <body> ca sa NU fie clipped de overflow-ul sidebar-ului -->
 <div id="tip" hidden></div>

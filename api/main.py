@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Backend FastAPI pentru demo-ul de detectie a fraudelor (Capitolul 7).
+# Backend FastAPI pentru demo-ul de detectie a fraudelor.
 #
 # Rulare:
 #   pip install fastapi uvicorn
@@ -22,12 +21,15 @@ from fastapi.staticfiles import StaticFiles
 from .generator import TransactionGenerator
 from .model import FraudDetector
 from .preprocessor import Preprocessor
+from .sampler import DatasetSampler
 from .schemas import (
     AUC_PR,
     DEFAULT_THRESHOLD,
     FEATURE_NAMES,
     HealthResponse,
     PredictResponse,
+    SampleMeta,
+    SampleResponse,
     TransactionInput,
 )
 
@@ -37,6 +39,7 @@ RF_PATH     = ROOT / "models" / "rf_smote.joblib"
 XGB_PATH    = ROOT / "models" / "xgb_smote.joblib"
 LGBM_PATH   = ROOT / "models" / "lgbm_smote.joblib"
 DATA_PATH   = ROOT / "data" / "creditcard.csv"
+SAMPLE_PATH = ROOT / "data" / "demo_sample.csv"
 STATS_CACHE = ROOT / "data" / "demo_stats.joblib"
 STATIC_DIR  = Path(__file__).resolve().parent / "static"
 
@@ -51,15 +54,21 @@ app = FastAPI(
 detector:     FraudDetector | None = None
 preprocessor: Preprocessor | None = None
 tx_generator: TransactionGenerator | None = None
+sampler:      DatasetSampler | None = None
 
 
 @app.on_event("startup")
 def load_resources():
-    global detector, preprocessor, tx_generator
+    global detector, preprocessor, tx_generator, sampler
     detector = FraudDetector(RF_PATH, XGB_PATH, LGBM_PATH)
     stats = Preprocessor.load_stats(STATS_CACHE, DATA_PATH)
     preprocessor = Preprocessor(stats)
     tx_generator = TransactionGenerator(stats)
+    if SAMPLE_PATH.exists():
+        sampler = DatasetSampler(SAMPLE_PATH)
+        print(f"[startup] subset exemple reale: {len(sampler.df)} randuri din demo_sample.csv")
+    else:
+        print(f"[startup] AVERTISMENT: {SAMPLE_PATH} lipseste — endpoint-urile /samples nu vor functiona.")
     print(f"[startup] 3 modele + SHAP + statistici incarcate. Features: {len(FEATURE_NAMES)}")
 
 
@@ -102,6 +111,25 @@ def generate(class_type: str):
         raise HTTPException(503, "Generator neincarcat.")
     try:
         return tx_generator.generate(class_type)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.get("/samples", response_model=list[SampleMeta])
+def list_samples():
+    """Listare usoara a exemplelor reale (pentru dropdown)."""
+    if sampler is None:
+        raise HTTPException(503, "Subset exemple reale neincarcat (lipseste demo_sample.csv).")
+    return sampler.list_meta()
+
+
+@app.get("/samples/{index}", response_model=SampleResponse)
+def get_sample(index: int):
+    """Returneaza un rand real (30 features brute) + eticheta adevarata."""
+    if sampler is None:
+        raise HTTPException(503, "Subset exemple reale neincarcat (lipseste demo_sample.csv).")
+    try:
+        return sampler.get(index)
     except ValueError as e:
         raise HTTPException(400, str(e))
 

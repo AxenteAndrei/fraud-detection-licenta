@@ -1,40 +1,38 @@
 // ============================================================
 // render.js — randarea rezultatului (badge, bara, modele, SHAP, istoric).
-// Re-randeaza din LAST + pragul curent, fara reapel API.
+// Re-randeaza din LAST, fara reapel API. Decizia foloseste pragul fix returnat
+// de model (DEFAULT_THRESHOLD = 0.50).
 // ============================================================
 
 let LAST = null;
 let HISTORY = [];
 
-function getThreshold(){ return parseFloat(document.getElementById("thr-slider").value); }
-
 function applyAll(){
   if(!LAST) return;
-  const t = getThreshold();
-  document.getElementById("thr-val").textContent = t.toFixed(2);
   const r = LAST.resp;
-  const p = r.probability;                 // P(frauda) — model principal RF
+  const t = r.threshold;                    // prag fix de decizie (0.50)
+  const p = r.probability;                  // P(frauda) — model principal RF
   const fraud = p >= t;
 
   renderBadge(fraud, p);
   renderBar(p, t);
   renderModels(r.models, t);
+  renderTruth(LAST.trueLabel, fraud);
 
   const topNames = r.shap.slice(0,3).map(c=>c.feature).join(", ");
-  document.getElementById("msg-wrap").innerHTML = `<div class="msg">${composeMsg(fraud, topNames, t)}</div>`;
+  document.getElementById("msg-wrap").innerHTML = `<div class="msg">${composeMsg(fraud, topNames)}</div>`;
   renderShap(r.shap);
 }
 
-// ---------------------------------------------------------------- mesaj (threshold-aware)
-function composeMsg(fraud, topNames, t){
-  const prag = t.toFixed(2);
+// ---------------------------------------------------------------- mesaj explicativ
+function composeMsg(fraud, topNames){
   if(fraud){
     return `Modelul considera ca aceasta tranzactie prezinta caracteristici asociate fraudei. `+
-           `Cele mai influente variabile in decizie au fost: ${topNames}. Un scor peste pragul de ${prag} `+
-           `ar declansa o verificare manuala sau blocarea tranzactiei.`;
+           `Cele mai influente variabile in decizie au fost: ${topNames}. Scorul depaseste limita `+
+           `de decizie, ceea ce ar declansa o verificare manuala sau blocarea tranzactiei.`;
   }
   return `Modelul estimeaza ca tranzactia este legitima. Cele mai relevante variabile analizate au fost: `+
-         `${topNames}. Scorul ramane sub pragul de ${prag}, deci nu se recomanda blocarea.`;
+         `${topNames}. Scorul ramane sub limita de decizie, deci nu se recomanda blocarea.`;
 }
 
 // ---------------------------------------------------------------- componente rezultat
@@ -46,34 +44,50 @@ function renderBadge(fraud, p){
     : `<span class="badge legit">LEGITIMA &middot; ${conf}% siguranta</span>`;
 }
 
+// Componenta dedicata exemplelor reale din dataset: dupa predictie, dezvaluie
+// eticheta reala (din setul de test) si o compara cu verdictul modelului.
+// Nu apare la date manuale/sintetice.
+function renderTruth(trueLabel, fraud){
+  const el=document.getElementById("truth-wrap");
+  if(!trueLabel){ el.innerHTML=""; el.hidden=true; return; }
+  el.hidden=false;
+  const pred = fraud ? "FRAUDA" : "LEGITIMA";
+  const ok = pred === trueLabel;
+  el.innerHTML=`<div class="truth ${ok?'ok':'bad'}">
+      <span class="truth-mark">${ok?'&#10003;':'&#10007;'}</span>
+      <span>Eticheta reala: <b>${trueLabel}</b> &middot; model: <b>${pred}</b> &mdash;
+        ${ok?'model corect':'model gresit'}</span>
+    </div>`;
+}
+
 function renderBar(p, t){
   const pct = (p*100).toFixed(1);
-  const tpct = (t*100).toFixed(0);
   const fraud = p >= t;
   document.getElementById("prob-wrap").innerHTML=`
     <div class="prob">
       <div class="prob-head"><span>Probabilitate de frauda</span><span class="prob-pct">${pct}%</span></div>
       <div class="prob-bar">
         <div class="prob-fill ${fraud?'fraud':'legit'}" style="width:${pct}%"></div>
-        <div class="prob-thr" style="left:${tpct}%" title="prag ${t.toFixed(2)}"></div>
       </div>
-      <div class="prob-foot"><span>0%</span><span class="prob-thr-lab" style="left:${tpct}%">prag ${t.toFixed(2)}</span><span>100%</span></div>
+      <div class="prob-foot"><span>0%</span><span>100%</span></div>
     </div>`;
 }
 
 function renderModels(models, t){
   const cards = models.map(m=>{
     const fraud = m.probability >= t;
-    const pct=(m.probability*100).toFixed(1);
+    // Afisam siguranta deciziei (increderea in verdictul propriu), nu P(frauda) bruta:
+    // pentru o tranzactie legitima => 100 - P(frauda), evitand confuzia (ex. 98% LEGITIMA).
+    const conf=((fraud ? m.probability : 1-m.probability)*100).toFixed(1);
     const star = m.name==="RandomForest" ? `<span class="m-star" title="model principal">&#9733;</span>` : "";
     return `<div class="model-card ${fraud?'fraud':'legit'}">
         <div class="m-name">${m.name}${star}</div>
-        <div class="m-prob">${pct}%</div>
+        <div class="m-prob">${conf}%</div>
         <div class="m-pill ${fraud?'fraud':'legit'}">${fraud?'FRAUDA':'LEGITIMA'}</div>
       </div>`;
   }).join("");
   document.getElementById("models-wrap").innerHTML =
-    `<div class="res-sub-title">Comparatie modele &mdash; P(frauda)</div><div class="models">${cards}</div>`;
+    `<div class="res-sub-title">Comparatie modele &mdash; siguranta deciziei</div><div class="models">${cards}</div>`;
 }
 
 function renderShap(contribs){
@@ -99,7 +113,7 @@ function renderShap(contribs){
 
 // ---------------------------------------------------------------- istoric (in memorie)
 function pushHistory(j, payload){
-  const t=getThreshold();
+  const t=j.threshold;                       // prag fix de decizie (0.50)
   const p=j.probability*100;
   const label = j.probability>=t ? "FRAUDA" : "LEGITIMA";
   HISTORY.unshift({amount:payload.Amount, time:payload.Time, p, label});

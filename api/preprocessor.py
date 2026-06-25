@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Preprocesare aplicata inainte de predictie:
 # Time si Amount sunt standardizate cu media + std din dataset, V1..V28 raman
 # nemodificate (sunt deja PCA-standardizate la antrenare).

@@ -93,6 +93,81 @@ header .sub{color:var(--muted); font-size:.82rem; margin-top:3px; font-weight:50
 .gen-row{display:flex; gap:10px; margin-bottom:10px;}
 .gen-row .btn{flex:1;}
 
+/* ---- exemple reale din dataset (dropdown custom) ---- */
+.sample-box{
+  margin:0 0 12px; padding:12px; border-radius:11px;
+  background:var(--panel); border:1px solid var(--border-soft);
+}
+.sample-lab{
+  display:flex; align-items:center; gap:6px;
+  font-size:.82rem; font-weight:700; color:var(--text); margin-bottom:5px;
+}
+.sample-tag{
+  margin-left:auto; font-size:.62rem; font-weight:700; letter-spacing:.04em;
+  text-transform:uppercase; color:#93c5fd;
+  background:rgba(59,130,246,.14); border:1px solid rgba(59,130,246,.35);
+  padding:2px 7px; border-radius:20px;
+}
+.sample-hint{color:var(--muted); font-size:.73rem; line-height:1.45; margin:0 0 10px;}
+
+.dd{position:relative;}
+.dd-trigger{
+  width:100%; display:flex; align-items:center; gap:8px;
+  padding:10px 12px; border-radius:9px; cursor:pointer;
+  background:var(--line-2); color:var(--text);
+  border:1px solid var(--line); font-family:inherit; font-size:.82rem; text-align:left;
+  transition:background .15s, border-color .15s;
+}
+.dd-trigger:hover{background:var(--line);}
+.dd.open .dd-trigger{border-color:#3b82f6; background:var(--line);}
+.dd-trigger-text{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-variant-numeric:tabular-nums;}
+.dd-caret{
+  width:0; height:0; flex:none;
+  border-left:5px solid transparent; border-right:5px solid transparent;
+  border-top:6px solid var(--muted); transition:transform .18s;
+}
+.dd.open .dd-caret{transform:rotate(180deg);}
+
+.dd-panel{
+  margin-top:6px; border-radius:9px;
+  background:var(--panel-2); border:1px solid var(--line);
+  box-shadow:0 10px 30px rgba(0,0,0,.45); overflow:hidden;
+}
+.dd-search{
+  width:100%; box-sizing:border-box; padding:9px 11px; border:none;
+  border-bottom:1px solid var(--border); outline:none;
+  background:var(--bg-side); color:var(--text);
+  font-family:inherit; font-size:.78rem;
+}
+.dd-search::placeholder{color:var(--muted-2);}
+.dd-list{max-height:230px; overflow-y:auto; padding:5px;}
+.dd-list::-webkit-scrollbar{width:8px;}
+.dd-list::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
+.dd-item{
+  width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:8px 10px; border:none; border-radius:7px; cursor:pointer;
+  background:transparent; color:var(--text);
+  font-family:inherit; font-size:.8rem; text-align:left;
+  transition:background .12s;
+}
+.dd-item:hover{background:var(--line-2);}
+.dd-item.sel{background:rgba(59,130,246,.16); outline:1px solid rgba(59,130,246,.4);}
+.dd-id{font-weight:700; color:var(--muted); min-width:42px;}
+.dd-amt{font-variant-numeric:tabular-nums; font-weight:600;}
+.dd-cur{color:var(--muted-2); font-weight:500; font-size:.72rem;}
+.dd-empty{padding:14px; text-align:center; color:var(--muted-2); font-size:.78rem; font-style:italic;}
+
+/* ---- eticheta reala vs predictie (doar exemple reale, sub comparatia de modele) ---- */
+.truth{
+  display:flex; align-items:center; gap:9px;
+  margin:10px 0 4px; padding:10px 13px; border-radius:10px;
+  font-size:.84rem; font-weight:500;
+}
+.truth.ok{background:var(--green-soft); color:#86efac; border:1px solid rgba(34,197,94,.4);}
+.truth.bad{background:var(--red-soft); color:#fca5a5; border:1px solid rgba(239,68,68,.4);}
+.truth-mark{font-size:1.15rem; font-weight:800;}
+.truth b{color:var(--text);}
+
 .btn{
   border:none; border-radius:10px; padding:11px 14px;
   font-family:inherit; font-size:.85rem; font-weight:600;
@@ -343,37 +418,9 @@ footer{
 .prob-fill{ height:100%; width:0; border-radius:7px; transition:width .4s cubic-bezier(.2,.7,.3,1); }
 .prob-fill.fraud{ background:linear-gradient(90deg,#ef4444,#dc2626); }
 .prob-fill.legit{ background:linear-gradient(90deg,#22c55e,#16a34a); }
-.prob-thr{
-  position:absolute; top:-3px; bottom:-3px; width:2px;
-  background:#e5e7eb; transform:translateX(-1px);
-}
-.prob-thr::before{
-  content:""; position:absolute; top:-4px; left:-3px;
-  border-left:4px solid transparent; border-right:4px solid transparent;
-  border-top:5px solid #e5e7eb;
-}
 .prob-foot{ position:relative; height:16px; margin-top:4px; font-size:.68rem; color:var(--muted-2); }
 .prob-foot > span:first-child{ position:absolute; left:0; }
 .prob-foot > span:last-child{ position:absolute; right:0; }
-.prob-thr-lab{ position:absolute; transform:translateX(-50%); color:var(--muted); font-weight:600; white-space:nowrap; }
-
-
-/* =================================================== prag de decizie */
-.thr-control{
-  background:var(--panel-2); border:1px solid var(--border-soft);
-  border-radius:10px; padding:14px 16px; margin:8px 0 4px;
-}
-.thr-head{
-  display:flex; justify-content:space-between; align-items:center;
-  font-size:.85rem; font-weight:600; color:var(--text);
-}
-.thr-num{
-  font-variant-numeric:tabular-nums; color:#fff;
-  background:var(--line-2); border:1px solid var(--line);
-  padding:2px 11px; border-radius:12px;
-}
-.thr-control input[type=range]{ margin-top:11px; }
-.thr-hint{ color:var(--muted); font-size:.74rem; margin:9px 0 0; line-height:1.45; }
 
 /* =================================================== comparatie modele */
 .models{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }

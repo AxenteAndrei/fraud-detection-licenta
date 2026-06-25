@@ -8,7 +8,7 @@ const TOP_LABEL = {
   V12:"V12 * (imp=0.1148)", V17:"V17 * (imp=0.1106)", V16:"V16 * (imp=0.0785)"
 };
 
-// Texte de ajutor ONESTE. Amount/Time au semnificatie reala; V1-V28 sunt
+// Texte de ajutor pentru utilizator. Amount/Time au semnificatie reala; V1-V28 sunt
 // componente PCA anonimizate (fara nume real, din motive de confidentialitate).
 const HELP = {
   Amount: "Suma tranzactiei in EUR. Fraudele au tipic sume mici (mediana 9.25 EUR), dar pot aparea si sume mari.",

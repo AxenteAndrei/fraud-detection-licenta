@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Pydantic models + constante partajate.
 
 from pydantic import BaseModel, ConfigDict, create_model
@@ -44,3 +43,18 @@ class HealthResponse(BaseModel):
     status: str
     model: str
     auc_pr: float
+
+
+class SampleMeta(BaseModel):
+    # element de listare pentru dropdown-ul cu exemple reale
+    index: int
+    true_label: str          # "FRAUDA" / "LEGITIMA" — eticheta adevarata (Class)
+    amount: float
+    orig_index: int          # rândul corespunzator din creditcard.csv
+
+
+class SampleResponse(BaseModel):
+    index: int
+    true_label: str
+    orig_index: int
+    features: TransactionInput   # 30 valori BRUTE, complete (fara clamp)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Generare de tranzactii sintetice reprezentative pentru o clasa.
 # Esantioane scoase din N(mean, std) per-feature, clip la intervalele
 # observate in dataset.
