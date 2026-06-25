@@ -26,9 +26,10 @@ date puternic dezechilibrat.
 │   ├── preprocessor.py           # Scalare Time/Amount, statistici dataset
 │   ├── model.py                  # 3 modele (RF/XGBoost/LightGBM) + SHAP local
 │   ├── generator.py              # Generare tranzactii sintetice per-clasa
+│   ├── sampler.py                # Esantionare tranzactii reale din setul de test
 │   └── static/                   # Frontend SPA (index.html, style.css, config/ui/render/app.js)
-├── figures/                      # Figuri exportate pentru lucrare (PNG, 300 dpi)
-├── data/                         # Nu e pe Git — adauga manual creditcard.csv
+├── figures/                      # Figuri generate de notebooks (PNG, 300 dpi)
+├── data/                         # demo_sample.csv (inclus); creditcard.csv — adauga manual
 └── models/                       # Nu e pe Git — generate de notebooks
 ```
 
@@ -54,8 +55,6 @@ Pune `creditcard.csv` in folderul `data/`.
 
 ```bash
 jupyter notebook
-# sau, direct cu interpretorul Anaconda:
-# "C:/Users/Gabi-Del/anaconda3/python.exe" -m jupyter notebook
 ```
 
 Ordinea recomandata:
@@ -83,14 +82,17 @@ uvicorn api.main:app --reload
 ```
 
 Se deschide la `http://localhost:8000`:
-- `/` — frontend SPA: introdu parametrii tranzactiei sau genereaza automat exemple
-  legitime / frauda, apoi **Verifica tranzactie**. Rezultatul arata cele 3 modele in
-  paralel, contributiile SHAP locale si un prag de decizie reglabil.
+- `/` — frontend SPA: introdu parametrii tranzactiei, genereaza automat exemple
+  legitime / frauda sau alege o tranzactie reala din setul de test, apoi **Verifica
+  tranzactie**. Rezultatul arata cele 3 modele in paralel, contributiile SHAP locale
+  si, pentru exemplele reale, comparatia predictiei cu eticheta adevarata.
 - `/docs` — Swagger UI cu endpoint-urile REST.
 
 Endpoint-uri principale:
 - `POST /predict` — predictie (eticheta, probabilitate, cele 3 modele, contributii SHAP locale, mesaj).
 - `GET /generate/{class_type}` — genereaza o tranzactie sintetica (`legitimate` / `fraud`).
+- `GET /samples` — lista de tranzactii reale din setul de test (held-out), cu eticheta adevarata.
+- `GET /samples/{index}` — o tranzactie reala din setul de test (din `data/demo_sample.csv`).
 - `GET /health` — status model.
 
 ---
@@ -108,7 +110,8 @@ seturi de date dezechilibrate.
 
 ## De stiut
 
-- Folderele `data/` si `models/` **nu sunt versionate pe Git** (vezi `.gitignore`).
+- `data/creditcard.csv` si folderul `models/` **nu sunt versionate pe Git** (vezi
+  `.gitignore`); subsetul `data/demo_sample.csv` (folosit de `/samples`) este inclus.
   Dupa clonarea repo-ului:
   1. Adauga manual `data/creditcard.csv` (descarcat de pe
      [Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)).
